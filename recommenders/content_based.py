@@ -29,10 +29,12 @@
 
 # Script dependencies
 import os
+import re
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Importing data
 movies = pd.read_csv('resources/data/movies.csv')
@@ -40,21 +42,15 @@ ratings = pd.read_csv('resources/data/ratings.csv')
 movies.dropna(inplace=True)
 
 def data_preprocessing(subset_size):
-    """Prepare data for use within Content filtering algorithm.
+    movies['combined_features'] = movies['plot_keywords']+" "+movies['title_cast']+" "+movies['director']+" "+movies['genres']
 
-    Parameters
-    ----------
-    subset_size : int
-        Number of movies to use within the algorithm.
+    pattern =r'\| |\-|\.|\-'
 
-    Returns
-    -------
-    Pandas Dataframe
-        Subset of movies selected for content-based filtering.
-
-    """
+    movies['combined_features'] = movies['combined_features'].str.replace(pattern,' ').str.lower()
+    
     # Split genre data into individual words.
     movies['keyWords'] = movies['genres'].str.replace('|', ' ')
+    
     # Subset of the data
     movies_subset = movies[:subset_size]
     return movies_subset
