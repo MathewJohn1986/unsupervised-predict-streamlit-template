@@ -29,7 +29,6 @@
 
 # Script dependencies
 import os
-import re
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -37,21 +36,39 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Importing data
-movies = pd.read_csv('resources/data/movies.csv')
-ratings = pd.read_csv('resources/data/ratings.csv')
-movies.dropna(inplace=True)
+df_movies = pd.read_csv('https://raw.githubusercontent.com/tawmad1/Streamlit-app-data-AM6/main/movies.csv')
+df_imdb = pd.read_csv('https://raw.githubusercontent.com/tawmad1/Streamlit-app-data-AM6/main/imdb_data.csv')
+#df_movies = pd.read_csv('resources/data/movies.csv')
+#df_imdb = pd.read_csv('resources/data/imdb_data.csv')
+movies = pd.merge(df_movies,df_imdb, on='movieId',how='left')
+#def data_preprocessing(subset_size):
+"""Prepare data for use within Content filtering algorithm.
+    
+    Parameters
+    ----------
+    subset_size : int
+        Number of movies to use within the algorithm.
+
+    Returns
+    -------
+    Pandas Dataframe
+        Subset of movies selected for content-based filtering.
+
+"""
+
+
 
 def data_preprocessing(subset_size):
+    import re
+    #resources/data/movies.csv
+
+
     movies['combined_features'] = movies['plot_keywords']+" "+movies['title_cast']+" "+movies['director']+" "+movies['genres']
 
     pattern =r'\| |\-|\.|\-'
 
     movies['combined_features'] = movies['combined_features'].str.replace(pattern,' ').str.lower()
-    
-    # Split genre data into individual words.
-    movies['keyWords'] = movies['genres'].str.replace('|', ' ')
-    
-    # Subset of the data
+
     movies_subset = movies[:subset_size]
     return movies_subset
 
@@ -77,10 +94,12 @@ def content_model(movie_list,top_n=10):
     # Initializing the empty list of recommended movies
     recommended_movies = []
     data = data_preprocessing(27000)
-    # Instantiating and generating the count matrix
-    count_vec = CountVectorizer()
-    count_matrix = count_vec.fit_transform(data['keyWords'])
     indices = pd.Series(data['title'])
+    # Instantiating and generating the count matrix
+    from sklearn.feature_extraction.text import CountVectorizer
+    count_vec = CountVectorizer(stop_words=['NaN','nan','Nan','NAN','np.nan'], analyzer='word')
+    count_matrix = count_vec.fit_transform(data['combined_features'].apply(lambda x: np.str_(x)))
+    
     cosine_sim = cosine_similarity(count_matrix, count_matrix)
     # Getting the index of the movie that matches the title
     idx_1 = indices[indices == movie_list[0]].index[0]
