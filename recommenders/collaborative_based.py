@@ -118,7 +118,7 @@ def collab_model(movie_list,top_n=10):
 
     """
 
-    indices = pd.Series(movies_df['title'])
+    indices = pd.DataFrame(movies_df['title'])
     movie_ids = pred_movies(movie_list)
     df_init_users = ratings_df[ratings_df['userId']==movie_ids[0]]
     for i in movie_ids :
@@ -133,9 +133,9 @@ def collab_model(movie_list,top_n=10):
     rank_2 = cosine_sim[idx_2]
     rank_3 = cosine_sim[idx_3]
     # Calculating the scores
-    score_series_1 = pd.Series(rank_1).sort_values(ascending = False)
-    score_series_2 = pd.Series(rank_2).sort_values(ascending = False)
-    score_series_3 = pd.Series(rank_3).sort_values(ascending = False)
+    score_series_1 = pd.DataFrame(rank_1).sort_values(ascending = False)
+    score_series_2 = pd.DataFrame(rank_2).sort_values(ascending = False)
+    score_series_3 = pd.DataFrame(rank_3).sort_values(ascending = False)
      # Appending the names of movies
     listings = score_series_1.append(score_series_1).append(score_series_3).sort_values(ascending = False)
     recommended_movies = []
