@@ -129,13 +129,13 @@ def collab_model(movie_list,top_n=10):
     idx_2 = indices[indices == movie_list[1]].index[0]
     idx_3 = indices[indices == movie_list[2]].index[0]
     # Creating a Series with the similarity scores in descending order
-    rank_1 = cosine_sim[idx_1]
-    rank_2 = cosine_sim[idx_2]
-    rank_3 = cosine_sim[idx_3]
+    rank_1 = cosine_sim[idx_1].astype(int)
+    rank_2 = cosine_sim[idx_2].astype(int)
+    rank_3 = cosine_sim[idx_3].astype(int)
     # Calculating the scores
-    score_series_1 = pd.DataFrame(rank_1).sort_values(ascending = False)
-    score_series_2 = pd.DataFrame(rank_2).sort_values(ascending = False)
-    score_series_3 = pd.DataFrame(rank_3).sort_values(ascending = False)
+    score_series_1 = pd.Series(rank_1).sort_values(ascending = False)
+    score_series_2 = pd.Series(rank_2).sort_values(ascending = False)
+    score_series_3 = pd.Series(rank_3).sort_values(ascending = False)
      # Appending the names of movies
     listings = score_series_1.append(score_series_1).append(score_series_3).sort_values(ascending = False)
     recommended_movies = []
